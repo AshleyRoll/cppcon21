@@ -1,6 +1,18 @@
-#ifndef UTILS_USBDESCRIPTOR_H
-#define UTILS_USBDESCRIPTOR_H
+#ifndef USB_USBDESCRIPTOR_H
+#define USB_USBDESCRIPTOR_H
 
+
+//
+// This is a partial implementation, no support for:
+//
+//  - ideally, the USB standard Interface classes, subclasses and protocols would be
+//    supported using strong types built on the underlying types here
+//  - building string descriptors, but you can specify the index where used.
+//  - no support to alternative interfaces
+//  - Only have Bulk and Interrupt Endpoint Specialisation, others should be made,
+//    but can use the Endpoint class to create them
+//  - Interfaces are implicitly numbered, not manually numbered
+//
 
 // https://www.beyondlogic.org/usbnutshell/usb1.shtml
 // https://www.usbmadesimple.co.uk/index.html
@@ -8,8 +20,11 @@
 
 #include <cstdint>
 #include <span>
+#include <algorithm>
+#include <numeric>
+#include <tuple>
 
-namespace utils::usb {
+namespace usb::descriptor {
 
     namespace impl {
 
@@ -72,14 +87,15 @@ namespace utils::usb {
     public:
         constexpr static std::size_t DescriptorLength = 7;
 
+        // Endpoint is a literal type, no need to have a builder
         constexpr Endpoint(
             EndpointDirection direction,
-            uint8_t address,
+            std::uint8_t address,
             EndpointTransfer transfer,
             EndpointSynchronisation synchronisation,
             EndpointUsage usage,
-            uint16_t maxPacketSize,
-            uint8_t interval
+            std::uint16_t maxPacketSize,
+            std::uint8_t interval
         )
             : m_Direction(direction)
             , m_Address(address & 0x0F) // max endpoint = 15
@@ -91,7 +107,9 @@ namespace utils::usb {
         {
         }
 
-        constexpr void Render(std::span<std::uint8_t, DescriptorLength> buffer) const
+        constexpr std::size_t length() const { return DescriptorLength; }
+
+        constexpr void Render(std::span<std::uint8_t> buffer) const
         {
             // Length & descriptor type
             buffer[0] = DescriptorLength;
@@ -114,12 +132,12 @@ namespace utils::usb {
 
     private:
         EndpointDirection m_Direction;
-        uint8_t m_Address;
+        std::uint8_t m_Address;
         EndpointTransfer m_Transfer;
         EndpointSynchronisation m_Synchronisation;
         EndpointUsage m_Usage;
-        uint16_t m_MaxPacketSize;
-        uint8_t m_Interval;
+        std::uint16_t m_MaxPacketSize;
+        std::uint8_t m_Interval;
     };
 
     //
@@ -144,8 +162,224 @@ namespace utils::usb {
         {}
     };
 
+    //
+    // Simple definition for Interrupt endpoint
+    //
+    class InterruptEndpoint : public Endpoint
+    {
+    public:
+        constexpr InterruptEndpoint(
+                EndpointDirection direction,
+                std::uint8_t address,
+                std::uint16_t maxPacketSize,
+                std::uint8_t interval
+        ) : Endpoint(
+                direction,
+                address,
+                EndpointTransfer::Interrupt,
+                EndpointSynchronisation::None,
+                EndpointUsage::Data,
+                maxPacketSize,
+                interval
+        )
+        {}
+    };
+
+
+    //
+    // A generic interface definition templated on the number of endpoints
+    //
+
+    template<std::size_t NumEndpoints>
+    class Interface
+    {
+        // allow our make helper to construct us
+        template<typename ... TEPs> friend
+        constexpr auto define_interface(
+                std::uint8_t interfaceClass,
+                std::uint8_t interfaceSubClass,
+                std::uint8_t interfaceProtocol,
+                std::uint8_t stringIdentifier,
+                TEPs ... endpoints);
+    public:
+        constexpr static std::size_t InterfaceDescriptorLength = 9;
+
+
+        // compute the length needed to store this interface descriptor and all its endpoints
+        constexpr std::size_t length() const {
+            const auto epLength = std::accumulate(
+                    m_Endpoints.begin(), m_Endpoints.end(), 0,
+                    [](auto sum, auto ep) { return sum + ep.length(); });
+
+            return epLength + InterfaceDescriptorLength;
+        }
+
+        constexpr void Render(std::span<std::uint8_t> buffer, std::uint8_t interfaceNumber) const {
+            buffer[0] = InterfaceDescriptorLength;
+            buffer[1] = static_cast<std::uint8_t>(DescriptorType::Interface);
+            buffer[2] = interfaceNumber;
+            buffer[3] = 0;  // alternateSetting, not supported yet
+            buffer[4] = m_Endpoints.size();
+            buffer[5] = m_InterfaceClass;
+            buffer[6] = m_InterfaceSubClass;
+            buffer[7] = m_InterfaceProtocol;
+            buffer[8] = m_StringIdentifier;
+
+            std::size_t location{9};
+            for (auto &ep: m_Endpoints) {
+                const auto len = ep.length();
+                ep.Render(buffer.subspan(location, len));
+                location += len;
+            }
+        }
+
+    private:
+        constexpr Interface(
+                std::uint8_t interfaceClass,
+                std::uint8_t interfaceSubClass,
+                std::uint8_t interfaceProtocol,
+                std::uint8_t stringIdentifier,
+                std::array<Endpoint, NumEndpoints> endpoints
+        )
+                : m_InterfaceClass{interfaceClass}
+                , m_InterfaceSubClass{interfaceSubClass}
+                , m_InterfaceProtocol{interfaceProtocol}
+                , m_StringIdentifier{stringIdentifier}
+                , m_Endpoints{endpoints}
+        {
+        }
+
+
+        std::uint8_t m_InterfaceClass;
+        std::uint8_t m_InterfaceSubClass;
+        std::uint8_t m_InterfaceProtocol;
+        std::uint8_t m_StringIdentifier;
+        std::array<Endpoint, NumEndpoints> m_Endpoints;
+    };
+
+    // Helper to define an interface with a less painful calling convention
+    template<typename ... TEPs>
+    constexpr auto define_interface(
+        std::uint8_t interfaceClass,
+        std::uint8_t interfaceSubClass,
+        std::uint8_t interfaceProtocol,
+        std::uint8_t stringIdentifier,
+        TEPs ... endpoints)
+    {
+       return Interface<sizeof...(TEPs)>{
+           interfaceClass, interfaceSubClass, interfaceProtocol, stringIdentifier,
+           std::array<Endpoint, sizeof...(TEPs)>{ endpoints... }
+       };
+    }
+
+    template<typename ... TEPs>
+    constexpr auto define_vendor_specific_interface(
+        std::uint8_t stringIdentifier,
+        TEPs ... endpoints)
+    {
+        return define_interface(0xFF, 0xFF, 0xFF, stringIdentifier, endpoints...);
+    }
+
+
+
+    template<std::size_t ... Sizes>
+    class Configuration
+    {
+    public:
+        constexpr static std::size_t ConfigurationDescriptorSize = 9;
+        constexpr static std::uint8_t NumInterfaces = sizeof...(Sizes);
+
+        constexpr Configuration(
+            std::uint8_t stringIdentifier,
+            bool selfPowered,
+            bool remoteWakeup,
+            std::uint8_t maxPower_2mAUnits,
+            Interface<Sizes>... interfaces
+        )
+            : m_StringIdentifier{stringIdentifier}
+            , m_SelfPowered{selfPowered}
+            , m_RemoteWakeup{remoteWakeup}
+            , m_MaxPower_2mAUnits(maxPower_2mAUnits)
+            , m_Interfaces{ interfaces... }
+        {}
+
+
+        // compute the length needed to store this interface descriptor and all its endpoints
+        constexpr std::size_t length() const {
+            return ConfigurationDescriptorSize + std::apply(
+                [](auto && ... interfaces)
+                {
+                    return (0 + ... + interfaces.length());
+                },
+                m_Interfaces
+            );
+        }
+
+        constexpr void Render(std::span<std::uint8_t> buffer, std::uint8_t configurationNumber) const
+        {
+            buffer[0] = ConfigurationDescriptorSize;
+            buffer[1] = static_cast<std::uint8_t>(DescriptorType::Configuration);
+
+            buffer[4] = NumInterfaces;
+            buffer[5] = configurationNumber;
+            buffer[6] = m_StringIdentifier;
+            buffer[7] =                    0b1000'0000
+                        | m_SelfPowered  ? 0b0100'0000 : 0
+                        | m_RemoteWakeup ? 0b0010'0000 : 0;
+            buffer[8] = m_MaxPower_2mAUnits;
+
+            // track location so we can use it to set total length value in buffer[2-3]
+            std::size_t location{ConfigurationDescriptorSize};
+            std::apply(
+                [&](auto && ... interfaces)
+                {
+                    std::size_t index{0};
+
+                    auto render = [&](auto i) {
+                        auto len = i.length();
+                        i.Render(buffer.subspan(location, len), index);
+                        location += len;
+                    };
+
+                    ((render(interfaces)), ...);
+                },
+                m_Interfaces
+            );
+
+            // total length
+            impl::write_le(buffer.subspan<2, 2>(), location);
+        }
+
+    private:
+        std::uint8_t m_StringIdentifier;
+        bool m_SelfPowered;
+        bool m_RemoteWakeup;
+        std::uint8_t m_MaxPower_2mAUnits;
+
+        std::tuple<Interface<Sizes>...> m_Interfaces;
+    };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 }
 
 
-#endif //UTILS_USBDESCRIPTOR_H
+#endif // USB_USBDESCRIPTOR_H
