@@ -13,5 +13,6 @@ Also refer to the following separate repositories:
   string compression (C++20)
 - [AshleyRoll/crc_cpp](https://github.com/AshleyRoll/crc_cpp) CRC routines with
   compile-time generated look-up tables (C++17, C++20)
-
+- [AshleyRoll/cpp_usbdescriptor](https://github.com/AshleyRoll/cpp_usbdescriptor)
+  compile-time USB Descriptor generation
 
