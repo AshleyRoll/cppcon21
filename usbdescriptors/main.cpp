@@ -1,13 +1,14 @@
-#include <iostream>
-#include <iomanip>
+#include <cstdio>
+#include <cstdint>
 #include <array>
 
 #include "usbdescriptor.h"
 
-static auto buildUsbDescriptor = []() {
+constinit auto const usbConfiguration1Descriptor = usb::descriptor::MakeConfigurationDescriptor([]() {
     using namespace usb::descriptor;
 
     return Configuration{
+            1,
             3,
             false,
             false,
@@ -25,22 +26,32 @@ static auto buildUsbDescriptor = []() {
                     BulkEndpoint{EndpointDirection::In, 3, 512}
             )
     };
-};
-
-constexpr auto usbDescriptor = []() {
-    constexpr auto i = buildUsbDescriptor();
-    constexpr auto l = i.length();
-
-    std::array<uint8_t, l> data;
-
-    i.Render(data, 1);
-    return data;
-}();
+});
 
 
-int main() {
-    for(auto b : usbDescriptor)
+void DumpHexBlock(std::span<std::uint8_t const> buffer)
+{
+    constexpr static auto hex = "0123456789ABCDEF";
+
+    for(auto i = 0; i < buffer.size(); ++i)
     {
-        std::cout << "0x" << std::hex << static_cast<uint32_t>(b) << std::dec << "\n";
+        if(i % 8 == 0)
+            putchar('\n');
+        else
+            putchar(' ');
+
+        const auto b = buffer[i];
+
+        putchar(hex[(b >> 4)]);
+        putchar(hex[(b & 0x0F)]);
     }
+
+    putchar('\n');
+}
+
+
+
+int main()
+{
+    DumpHexBlock(usbConfiguration1Descriptor);
 }

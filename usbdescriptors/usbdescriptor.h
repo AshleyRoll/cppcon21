@@ -12,7 +12,13 @@
 //  - Only have Bulk and Interrupt Endpoint Specialisation, others should be made,
 //    but can use the Endpoint class to create them
 //  - Interfaces are implicitly numbered, not manually numbered
+//  - Doesn't yet support OTG, Class or Vendor specific descriptors
+//  - Doesn't create a device or device query descriptor, these would be build similar
+//    to the way an Endpoint does
 //
+// The Configuration Descriptor is actually sent back to the host with all the attached
+// Interface and Endpoint descriptors, which is why they are packaged up into a single
+// buffer. This is the most complex to build.
 
 // https://www.beyondlogic.org/usbnutshell/usb1.shtml
 // https://www.usbmadesimple.co.uk/index.html
@@ -28,6 +34,7 @@ namespace usb::descriptor {
 
     namespace impl {
 
+        // helper to write a uint16_t as little endian ordering into a buffer
         constexpr void write_le(std::span<std::uint8_t, 2> buffer, std::uint16_t data)
         {
             buffer[0] = static_cast<std::uint8_t>(data & 0xFF);
@@ -79,8 +86,7 @@ namespace usb::descriptor {
     };
 
     //
-    // Endpoint allowing full control of definition. Suggested for Isochronous Endpoints
-    // or strange configurations
+    // Endpoint allowing full control of definition.
     //
     class Endpoint
     {
@@ -188,8 +194,9 @@ namespace usb::descriptor {
 
     //
     // A generic interface definition templated on the number of endpoints
+    // Use helper function define_interface() and other variants below for
+    // ease of use.
     //
-
     template<std::size_t NumEndpoints>
     class Interface
     {
@@ -280,8 +287,9 @@ namespace usb::descriptor {
         return define_interface(0xFF, 0xFF, 0xFF, stringIdentifier, endpoints...);
     }
 
-
-
+    //
+    // The configuation
+    //
     template<std::size_t ... Sizes>
     class Configuration
     {
@@ -290,13 +298,15 @@ namespace usb::descriptor {
         constexpr static std::uint8_t NumInterfaces = sizeof...(Sizes);
 
         constexpr Configuration(
+            std::uint8_t  configurationNumber,
             std::uint8_t stringIdentifier,
             bool selfPowered,
             bool remoteWakeup,
             std::uint8_t maxPower_2mAUnits,
             Interface<Sizes>... interfaces
         )
-            : m_StringIdentifier{stringIdentifier}
+            : m_ConfigurationNumber{configurationNumber}
+            , m_StringIdentifier{stringIdentifier}
             , m_SelfPowered{selfPowered}
             , m_RemoteWakeup{remoteWakeup}
             , m_MaxPower_2mAUnits(maxPower_2mAUnits)
@@ -315,17 +325,17 @@ namespace usb::descriptor {
             );
         }
 
-        constexpr void Render(std::span<std::uint8_t> buffer, std::uint8_t configurationNumber) const
+        constexpr void Render(std::span<std::uint8_t> buffer) const
         {
             buffer[0] = ConfigurationDescriptorSize;
             buffer[1] = static_cast<std::uint8_t>(DescriptorType::Configuration);
-
+            // total length inserted below after rendering content
             buffer[4] = NumInterfaces;
-            buffer[5] = configurationNumber;
+            buffer[5] = m_ConfigurationNumber;
             buffer[6] = m_StringIdentifier;
-            buffer[7] =                    0b1000'0000
-                        | m_SelfPowered  ? 0b0100'0000 : 0
-                        | m_RemoteWakeup ? 0b0010'0000 : 0;
+            buffer[7] =                     0b1000'0000
+                        | (m_SelfPowered  ? 0b0100'0000 : 0)
+                        | (m_RemoteWakeup ? 0b0010'0000 : 0);
             buffer[8] = m_MaxPower_2mAUnits;
 
             // track location so we can use it to set total length value in buffer[2-3]
@@ -351,6 +361,7 @@ namespace usb::descriptor {
         }
 
     private:
+        std::uint8_t m_ConfigurationNumber;
         std::uint8_t m_StringIdentifier;
         bool m_SelfPowered;
         bool m_RemoteWakeup;
@@ -359,25 +370,31 @@ namespace usb::descriptor {
         std::tuple<Interface<Sizes>...> m_Interfaces;
     };
 
+    // Concept to enforce a lambda
+    template<typename T, std::size_t ... Sizes>
+    concept CallableGivesConfiguration = requires(T t)
+    {
+        t();            // is callable
+        // result is a Configuration<...>
+        std::is_same_v<decltype(t()), Configuration<Sizes...>>;
+    };
 
+    //
+    // Rendering helper, pass in the lambda to generate the configuration
+    //
+    template<std::size_t ... Sizes>
+    constexpr static auto MakeConfigurationDescriptor(CallableGivesConfiguration<Sizes...> auto makeConfigLambda)
+    {
+        // build the configuration using the supplied lambda
+        constexpr auto cfg = makeConfigLambda();
+        constexpr auto len = cfg.length();
 
+        std::array<std::uint8_t, len> data;
 
+        cfg.Render(data);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        return data;
+    }
 
 }
 
