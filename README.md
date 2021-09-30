@@ -4,9 +4,7 @@
 
 This repository contains the slides and code from my CppCon '21 presentation.
 
-
 ## Code Samples
-
 
 Also refer to the following separate repositories:
 - [AshleyRoll/squeeze](https://github.com/AshleyRoll/squeeze) Compile-time
