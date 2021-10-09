@@ -50,7 +50,7 @@ class ConfigBuilder
     }
 
 private:
-    WatchDogMode m_Wdt {WatchDogMode::Disabled};
+    WatchDogMode m_Wdt {WatchDogMode::Disabled};            // configure safe defaults
     OscillatorMode m_Osc {OscillatorMode::InternalRC};
 };
 
