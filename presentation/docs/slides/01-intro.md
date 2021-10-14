@@ -2,7 +2,7 @@
 - The problem - what are we solving?
   - No external tools
   - Correctness
-  - Portabilty
+  - Portability
 
 - Motivating Examples
   - Look up tables
@@ -10,10 +10,13 @@
   - Prebuilt messages - USB descriptors
   - Compressed Data / Strings / Binary Blobs
 
+
+
 - Intro to `constexpr`
-  - What can be returned?
   - `constinit`
   - `consteval`
+  - What can be returned?
+  - Build data in a `constepxr` function
 
 - Lookup Tables
   - Approximating Functions
@@ -22,7 +25,6 @@
 
 - Configuration fuses
   - Between power on and `main()`
-  - Hardware uses data structures too
   - The traditional way
   - Using a lambda to build and return data
   - Transforming data
@@ -30,16 +32,14 @@
   - no need for vendor specific extensions
   - Incorporate Validation
 
-- Dicsussion
+- Writing Complex Compile-Time Code
   - Examples have result types (size) known to compiler
   - Allocating Memory
-  - `std` Containers
   - parameters are not constant in the constexpr context
-
-- Writing Complex Compile-Time Code
+  - Turning functions in to libraries
+    - Dealing with user supplied input as lambdas
   - STL containers and algorithms
   - Building Types from user data
-  - Limitations and Work-arounds
 
 - String Compression
 
