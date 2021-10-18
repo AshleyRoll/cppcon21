@@ -1,2 +1,2 @@
-<img class="r-streach" src="images/cppcon21-title.png" />
+<img class="r-stretch" src="images/cppcon21-title.png" />
 

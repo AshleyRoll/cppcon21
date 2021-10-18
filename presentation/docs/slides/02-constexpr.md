@@ -12,7 +12,8 @@
 
 Note:
 - Before C++20 there are many more restrictions
-- Refer to Jason Turner's Talk earlier today and  C++ Weekly Youtube channel
+- Refer to Jason Turner's Talk earlier today and C++ Weekly Youtube channel
+
 
 
 <!-- down -->
@@ -24,14 +25,16 @@ Note:
   - struct/class/union (with some constraints) <!-- .element: class="fragment" -->
   - a closure type (lambda) <!-- .element: class="fragment" -->
 - Must be immediately initialised <!-- .element: class="fragment" -->
+- Implies const <!-- .element: class="fragment" -->
 
 ```C++
-constexpr int BASE{0b0010'1000};
-constexpr std::array<int, 3> VALUES{1, 2, 3};
+constexpr int Base{0b0010'1000};
+constexpr std::array<int, 3> Values{1, 2, 3};
 
 int main()
 {
-    return BASE + VALUES[1];
+    // Base += 1;    // ERROR
+    return Base + Values[1];
 }
 ```
 <!-- .element: class="fragment" -->
@@ -87,5 +90,5 @@ int main()
 }
 
 ```
- <!-- .element: class="fragment" -->
+<!-- .element: class="fragment" -->
 
