@@ -12,7 +12,7 @@
 
 Note:
 - Before C++20 there are many more restrictions
-- Refer to Jason Turner's Talk earlier today and C++ Weekly Youtube channel
+- Refer to Jason Turner's Talk earlier today and C++ Weekly YouTube channel
 
 
 

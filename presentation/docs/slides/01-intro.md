@@ -3,6 +3,7 @@
   - No external tools
   - Correctness
   - Portability
+  - Making constexpr libraries
 
 - Lookup Tables
   - Approximating Functions
@@ -25,6 +26,9 @@
   - Turning functions in to libraries
     - Dealing with user supplied input as lambdas
   - STL containers and algorithms
+    - vector
+    - list
+    - unordered_map
   - Building Types from user data
 
 - String Compression

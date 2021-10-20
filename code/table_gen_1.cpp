@@ -22,8 +22,8 @@ struct LerpTable
 
         if(entry.input == clamped_in) {
             return entry.output; // handle exact match / first entry
-        } 
-         
+        }
+
         auto const prev_entry = *std::prev(entry_itr);
         auto const t = (clamped_in - prev_entry.input) / (entry.input - prev_entry.input);
         return std::lerp(prev_entry.output, entry.output, t);
@@ -40,7 +40,7 @@ struct LerpTable
         // fill the other entries
         T const step = (max - min) / NUM_ENTRIES;
         for(std::size_t i = 1; i < NUM_ENTRIES-1; ++i) {
-            float a = step * i;
+            T const a = step * i;
             table.entries[i] = {a, function(a)};
         }
 
