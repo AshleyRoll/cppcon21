@@ -2,7 +2,7 @@
 #include <array>
 #include <algorithm>
 
-enum class WatchDogMode : std::uint8_t
+enum class WatchDogMode
 {
     Disabled = 0,
     Enabled_1ms = 1,
@@ -10,7 +10,7 @@ enum class WatchDogMode : std::uint8_t
     Enabled_100ms = 3,
 };
 
-enum class OscillatorMode : std::uint8_t
+enum class OscillatorMode
 {
     InternalRC = 1,
     ExternalRC = 2,
@@ -39,12 +39,12 @@ class ConfigBuilder
         // Lets pretend the registers are 32 bits, and there 2 of them
         std::array<std::uint32_t, 2> registers;
 
-        auto wdt = static_cast<std::uint8_t>(m_Wdt);
-        auto osc = static_cast<std::uint8_t>(m_Osc);
+        auto wdt = static_cast<std::uint32_t>(m_Wdt);
+        auto osc = static_cast<std::uint32_t>(m_Osc);
 
         // lets pretend we need values and their complement
-        registers[0] = (wdt << 8u) | (~wdt & 0x0000'00FF);
-        registers[1] = (osc << 8u) | (~osc & 0x0000'00FF);
+        registers[0] = (wdt << 24u) | (~wdt & 0x0000'00FF);
+        registers[1] = (osc << 24u) | (~osc & 0x0000'00FF);
 
         return registers;
     }

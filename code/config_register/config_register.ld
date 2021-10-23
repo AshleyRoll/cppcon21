@@ -1,8 +1,8 @@
 /*
- * VERY minimal linker script to demo how to place config registers using
+ * World's worst linker script - VERY minimal to demo how to place config registers using
  * sections.
  *
- * Start with a real linker script for your platform
+ * Start with a real linker script for your platform...
  */
 ENTRY(main)
 
