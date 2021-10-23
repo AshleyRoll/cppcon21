@@ -135,10 +135,10 @@ constinit const auto CONFIG_REGISTERS = []{
 
 ```
 /* World's worst linker script */
-
+ENTRY(main)
 MEMORY
 {
-  config : ORIGIN = 0x0100, LENGTH = 0x8
+  config    : ORIGIN = 0x0100, LENGTH = 0x8
   prog (rx) : ORIGIN = 0x1000, LENGTH = 0x100000
 }
 
@@ -150,9 +150,9 @@ SECTIONS
   } > config
 
   /* everyting else - don't do this */
-  .text : { *(.text) *(.text.*) } > prog
-  .data : { *(.data) } > prog
-  .bss : { *(.bss) } > prog
+  .text     : { *(.text) *(.text.*) } > prog
+  .data     : { *(.data) } > prog
+  .bss      : { *(.bss) } > prog
   /DISCARD/ : { *(.*) }
 }
 
@@ -163,6 +163,8 @@ SECTIONS
 
 <!-- down -->
 Compile and link with the linker script
+
+`build.sh`
 
 ```bash
 gcc -O3 --std=c++20 -c main.cpp -o main.o
@@ -191,6 +193,5 @@ Disassembly of section .text:
     1002:       c3                      ret
 
 ```
-<!-- .element: class="r-stretch" -->
 
 
