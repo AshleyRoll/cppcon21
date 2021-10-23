@@ -21,8 +21,8 @@ enum class OscillatorMode : std::uint8_t
 // Simple Config builder that sets watchdog and oscillator
 class ConfigBuilder
 {
-  public: 
-    constexpr void set_watchdog(WatchDogMode wtd) 
+  public:
+    constexpr void set_watchdog(WatchDogMode wtd)
     {
         m_Wdt = wtd;
     }
@@ -56,13 +56,13 @@ private:
 
 // Now lets use the configuration builder to configure the processor
 //
-// We simply constinit the value and place it into a named section. 
-// Then use the linker script to map that into the correct Flash Memory 
+// We simply constinit the value and place it into a named section.
+// Then use the linker script to map that into the correct Flash Memory
 // address.
 //
 // NO compiler extensions or paragmas needed to set up the processor hardware now.
-[[gnu::section(".config_registers")]]
-constinit auto CONFIG_REGISTERS = []{
+[[gnu::section(".config_registers"), gnu::used]]
+constinit const auto CONFIG_REGISTERS = []{
     ConfigBuilder cfg;
 
     cfg.set_watchdog(WatchDogMode::Enabled_10ms);
@@ -71,3 +71,7 @@ constinit auto CONFIG_REGISTERS = []{
     return cfg.build();
 }();
 
+int main()
+{
+    return 0;
+}

@@ -5,7 +5,8 @@
 - USB Descriptor
 - Compressed String Tables
 
-Code samples will be available on GitHub
+Code samples available on GitHub
+https://github.com/AshleyRoll/cppcon21
 
 ---
 
@@ -142,6 +143,4 @@ Note:
   - will return first entry on 0.0f
   - special case exact match to avoid the LERP
     and handle first element where no previous
-
-
 
