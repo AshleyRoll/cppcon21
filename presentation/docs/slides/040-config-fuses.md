@@ -9,7 +9,7 @@
 
 
 <!-- down -->
-## Config Fuses
+### Config Fuses
 
 - Vendor specific compiler extensions to set fuses
   - pragmas, or similar
