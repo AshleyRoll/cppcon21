@@ -89,7 +89,7 @@ constexpr auto build()
 
 ```C++
 [[gnu::section(".config_registers"), gnu::used]]
-constinit const auto CONFIG_REGISTERS = []{
+constinit auto const CONFIG_REGISTERS = []{
     ConfigBuilder cfg;
     cfg.set_watchdog(WatchDogMode::Enabled_10ms);
     cfg.set_oscillator(OscillatorMode::Crystal);

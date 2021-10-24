@@ -62,7 +62,7 @@ private:
 //
 // NO compiler extensions or paragmas needed to set up the processor hardware now.
 [[gnu::section(".config_registers"), gnu::used]]
-constinit const auto CONFIG_REGISTERS = []{
+constinit auto const CONFIG_REGISTERS = []{
     ConfigBuilder cfg;
 
     cfg.set_watchdog(WatchDogMode::Enabled_10ms);

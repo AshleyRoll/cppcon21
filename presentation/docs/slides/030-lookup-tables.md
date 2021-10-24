@@ -1,15 +1,3 @@
-## Building Resources
-
-- Lookup Tables
-- Configuration Fuses
-- USB Descriptor
-- Compressed String Tables
-
-Code samples available on GitHub
-https://github.com/AshleyRoll/cppcon21
-
----
-
 ## Lookup Tables
 
 Lets make a lookup table that does linear interpolation.
