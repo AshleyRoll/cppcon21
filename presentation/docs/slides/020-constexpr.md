@@ -30,9 +30,7 @@ Note:
 ```C++
 constexpr int Base{0b0010'1000};
 constexpr std::array<int, 3> Values{1, 2, 3};
-
-int main()
-{
+int main() {
     // Base += 1;    // ERROR
     return Base + Values[1];
 }
@@ -74,7 +72,6 @@ Note:
 ## constinit
 
 - Specifies a variable has static initialization <!-- .element: class="fragment" -->
-  - zero initialised (not that useful for us) <!-- .element: class="fragment" -->
   - constant initialised (from a constant expression) <!-- .element: class="fragment" -->
 - computed at compile-time, and stored in program binary <!-- .element: class="fragment" -->
   - can be mutable or const <!-- .element: class="fragment" -->
@@ -82,9 +79,7 @@ Note:
 ```C++
 constinit int foo = 10;
 constinit const bar = 1;
-
-int main()
-{
+int main() {
     foo += 1;
     // bar += 1;  // ERROR
 }
