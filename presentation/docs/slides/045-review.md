@@ -37,8 +37,7 @@
 <!-- down -->
 ## Lambdas for the win!
 
-- A capture-less, parameter less lambda's call operator
-  is constexpr
+- A lambda's call operator can be constexpr
   <!-- .element: class="fragment" -->
 - Each lambda is a unique type and its return type is known
   at compile-time
@@ -48,7 +47,7 @@
   resource!
   <!-- .element: class="fragment" -->
 - These are effectively templated functions, but we will use the
-  cleaner auto syntax
+  cleaner auto parameter syntax for our helper functions
   <!-- .element: class="fragment" -->
 
 

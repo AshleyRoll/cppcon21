@@ -78,7 +78,7 @@ Note:
 
 ```C++
 constinit int foo = 10;
-constinit const bar = 1;
+constinit const int bar = 1;
 int main() {
     foo += 1;
     // bar += 1;  // ERROR

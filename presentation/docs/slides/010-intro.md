@@ -1,37 +1,26 @@
+## Introduction
 
-- The problem - what are we solving?
-  - No external tools
-  - Correctness
-  - Portability
-  - Making constexpr libraries
+Explore how C++20's constexper features can:
 
-- Lookup Tables
-  - Approximating Functions
-  - returning from a `constexpr` function
-  - CRC example
+- Generate data from code at compile-time
+  <!-- .element: class="fragment" -->
+- Be used to construct:
+    <!-- .element: class="fragment" -->
+  - Lookup Tables
+    <!-- .element: class="fragment" -->
+  - Configuration Fuses
+    <!-- .element: class="fragment" -->
+  - Compressed Strings
+    <!-- .element: class="fragment" -->
+  - USB Descriptors
+    <!-- .element: class="fragment" -->
 
-- Configuration fuses
-  - Between power on and `main()`
-  - The traditional way
-  - Using a lambda to build and return data
-  - Transforming data
-  - `constinit` and the linker script
-  - no need for vendor specific extensions
-  - Incorporate Validation
 
-- Writing Complex Compile-Time Code
-  - Examples have result types (size) known to compiler
-  - Allocating Memory
-  - parameters are not constant in the constexpr context
-  - Turning functions in to libraries
-    - Dealing with user supplied input as lambdas
-  - STL containers and algorithms
-    - vector
-    - list
-    - unordered_map
-  - Building Types from user data
 
-- String Compression
+<!-- down -->
+### Along the way
 
-- USB Descriptors
-
+- Introduce some libraries I created for this code
+<!-- .element: class="fragment" -->
+- Discuss some techniques I found building compile-time libraries
+<!-- .element: class="fragment" -->

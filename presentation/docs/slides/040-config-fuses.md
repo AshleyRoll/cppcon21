@@ -1,10 +1,15 @@
 ## Config Fuses
 
 - Initialise hardware before the processor starts
+  <!-- .element: class="fragment" -->
 - Fixed locations in Flash memory, filled with bit-mapped magic values
+  <!-- .element: class="fragment" -->
 - Sets up
+  <!-- .element: class="fragment" -->
   - clocks, memory segments, watchdog timer
+    <!-- .element: class="fragment" -->
   - JTAG debug, code security, and much more
+    <!-- .element: class="fragment" -->
 
 
 
@@ -12,10 +17,15 @@
 ### Config Fuses
 
 - Vendor specific compiler extensions to set fuses
+  <!-- .element: class="fragment" -->
   - pragmas, or similar
+    <!-- .element: class="fragment" -->
   - special macros
-- Rely on C style `#define` for bit values
+    <!-- .element: class="fragment" -->
+- Rely on C style #define for bit values
+  <!-- .element: class="fragment" -->
 - No validation, potentially very complex
+  <!-- .element: class="fragment" -->
 
 
 
@@ -23,9 +33,13 @@
 ### Lets do better
 
 - Strongly type all configuration registers
+  <!-- .element: class="fragment" -->
 - Provide a "builder" object
+  <!-- .element: class="fragment" -->
 - Render a constinit object, at compile-time
+  <!-- .element: class="fragment" -->
 - Place it in Flash using segments and linker script
+  <!-- .element: class="fragment" -->
 
 
 
@@ -102,7 +116,7 @@ constinit auto const CONFIG_REGISTERS = []{
   <!-- .element: class="fragment" -->
 - gnu:section places value in .config_registers section
   <!-- .element: class="fragment" -->
-- gnu:unused stops compiler discarding it if not referenced
+- gnu:used stops compiler discarding it if not referenced in code
   <!-- .element: class="fragment" -->
 
 

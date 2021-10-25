@@ -8,8 +8,10 @@ Lets make a USB Configuration descriptor
 - Simple Reference for USB protocol
   https://www.beyondlogic.org/usbnutshell/usb1.shtml
 - This is a brief overview, check out the code for implementation details
+  <!-- .element: class="fragment" -->
 - Most complex example - uses variadic templates, std::tuple and
   constexpr functions to deal with different sized interfaces
+  <!-- .element: class="fragment" -->
 
 
 
@@ -163,12 +165,19 @@ class Endpoint
 ### Rendering the descriptor
 
 - Each class has a length() method
+  <!-- .element: class="fragment" -->
 - Each class has a render() method taking std::span
+  <!-- .element: class="fragment" -->
 - the MakeConfigurationDescriptor() function then:
+  <!-- .element: class="fragment" -->
   - Calculates the required buffer size
+  <!-- .element: class="fragment" -->
   - calls the render method to fill an array
+  <!-- .element: class="fragment" -->
 - Use std::tuple of interfaces of varing number of endpoints
+  <!-- .element: class="fragment" -->
 - Use std::apply to fold over tuple for length/render
+  <!-- .element: class="fragment" -->
 
 
 

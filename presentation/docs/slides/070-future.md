@@ -1,4 +1,0 @@
-## Future
-
-- making it easier
-
