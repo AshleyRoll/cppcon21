@@ -5,9 +5,7 @@
   <!-- .element: class="fragment" -->
 - Jason Turner for so much help and advice
   <!-- .element: class="fragment" -->
-  - Nerd Sniped me real good &#128513;
-    <!-- .element: class="fragment" -->
-  - and encouraged me to submit this talk
+  - and encouraging me to submit this talk
     <!-- .element: class="fragment" -->
 
 

@@ -101,37 +101,6 @@ class Configuration
 
 <!-- down -->
 ```C++
-// Specific interface type helper function
-template<typename ... TEPs>
-constexpr auto define_vendor_specific_interface(
-    std::uint8_t stringIdentifier,
-    TEPs ... endpoints)
-{
-    return define_interface(
-        0xFF, 0xFF, 0xFF, stringIdentifier,
-        endpoints...);
-}
-
-// General Helper functions to create interface
-template<typename ... TEPs>
-constexpr auto define_interface(
-    std::uint8_t interfaceClass, std::uint8_t interfaceSubClass,
-    std::uint8_t interfaceProtocol, std::uint8_t stringIdentifier,
-    TEPs ... endpoints)
-{
-   return Interface<sizeof...(TEPs)>{
-       interfaceClass, interfaceSubClass,
-       interfaceProtocol, stringIdentifier,
-       std::array<Endpoint, sizeof...(TEPs)>{ endpoints... }
-   };
-}
-```
-<!-- .element: class="r-stretch" -->
-
-
-
-<!-- down -->
-```C++
 template<std::size_t NumEndpoints>
 class Interface
 {
@@ -156,6 +125,38 @@ class Endpoint
 };
 
 // derived class for BulkEndpoint, InterruptEndpoint etc...
+```
+<!-- .element: class="r-stretch" -->
+
+
+
+
+<!-- down -->
+```C++
+// Specific interface type helper function
+template<typename ... TEPs>
+constexpr auto define_vendor_specific_interface(
+    std::uint8_t stringIdentifier,
+    TEPs ... endpoints)
+{
+    return define_interface(
+        0xFF, 0xFF, 0xFF, stringIdentifier,
+        endpoints...);
+}
+
+// General Helper functions to create interface
+template<typename ... TEPs>
+constexpr auto define_interface(
+    std::uint8_t interfaceClass, std::uint8_t interfaceSubClass,
+    std::uint8_t interfaceProtocol, std::uint8_t stringIdentifier,
+    TEPs ... endpoints)
+{
+   return Interface<sizeof...(TEPs)>{
+       interfaceClass, interfaceSubClass,
+       interfaceProtocol, stringIdentifier,
+       std::array<Endpoint, sizeof...(TEPs)>{ endpoints... }
+   };
+}
 ```
 <!-- .element: class="r-stretch" -->
 
