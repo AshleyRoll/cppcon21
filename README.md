@@ -14,3 +14,6 @@ Also refer to the following separate repositories:
 - [AshleyRoll/cpp_usbdescriptor](https://github.com/AshleyRoll/cpp_usbdescriptor)
   compile-time USB Descriptor generation
 
+# Recording now available
+
+[![YouTube Recording of presentation](https://img.youtube.com/vi/KDO3hbMR1yc/0.jpg)](https://www.youtube.com/watch?v=KDO3hbMR1yc)
